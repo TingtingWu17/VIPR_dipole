@@ -9,7 +9,7 @@
 % Copyright by Boris Ferdman: borisferd@gmail.com
 %
 
-clear all;close all;clc
+%clear all;close all;clc
 %add current folders file into path
 %% data set
 VIPR_user_input_dipole;

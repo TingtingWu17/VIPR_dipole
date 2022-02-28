@@ -13,7 +13,8 @@ initial_pmask_name = 'pixOL_mask_com.mat';
 %% define optical parameters
 IS.Signal=1; % for generator - keep 1
 IS.bg=0; % for generator - keep 0
-IS.tophoton = 0.29;
+%IS.tophoton = 0.29;
+IS.tophoton = 0.66;
 
 %optical parameters
 IS.M=111.1111; % objective magnification
@@ -39,7 +40,10 @@ IS.p_vec = [0,0,0]; % incoherent
 
 
 %% load data
-beadsDatafile  = [pwd '\TW_pixOL_com_beads_data\combine_beads_data_152_to_data_164.mat']; % note the beads data: y channel is same as images captured on the camera, that is there is no need to flip the y channel image
+% two example datas: the first one is captured for all NFP focused at
+% beads; the second one is capture for NFP axially scanning the beads
+if exampleData == 1
+beadsDatafile  = [pwd '\TW_pixOL_com_beads_data\20220214_combine_beads_data_152_to_data_164.mat']; % note the beads data: y channel is same as images captured on the camera, that is there is no need to flip the y channel image
 load(beadsDatafile);
 IS.FOV_size = size(beads_img,1); % size of ROI used
 if vec_model_pol=='x'
@@ -50,7 +54,25 @@ end
 IMG_T  = SM1;
 xy = zeros(size(IMG_T,3),2);
 z_stack_pos = zeros(size(SM1,3),1)-90*10^-9; %position of NFP
-z_pos = -zeros(size(SM1,3),1)+IS.z_emit;  % position of the emitter
+z_pos = zeros(size(SM1,3),1)+IS.z_emit;  % position of the emitter
+
+elseif exmapleData ==2
+beadsDatafile  = [pwd '\TW_pixOL_com_beads_data\20210602_data12_beads_y_channel_unflipped.mat'];
+
+load(beadsDatafile);
+IS.FOV_size = size(beads_img,1); % size of ROI used
+if vec_model_pol=='x'
+    SM1 = beads_img(:,[1:IS.FOV_size],:)*IS.tophoton;
+elseif  vec_model_pol=='y'
+    SM1 = beads_img(:,[1:IS.FOV_size]+IS.FOV_size,:)*IS.tophoton;
+end
+IMG_T  = SM1;
+xy = zeros(size(IMG_T,3),2);
+z_stack_pos = [(-90-[-700:50:-50,50:50:700,0])*10^-9];
+z_stack_pos = repmat(z_stack_pos,11,1);
+z_stack_pos = reshape(z_stack_pos,[],1);
+z_pos = zeros(size(SM1,3),1)+IS.z_emit;  % position of the emitter
+end
 %% optimization parameters
 % the parameters in this section define the optimization proccess
 
